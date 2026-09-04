@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Azure Resource Name Builder</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Azure Resource Name Builder</h1>
+    <p class="subtitle">Build compliant Azure resource names from the naming standard.</p>
+  </header>
+
+  <main>
+    <!-- FORM ---------------------------------------------------------------- -->
+    <section class="card form-card">
+      <h2>Build a name</h2>
+
+      <!-- Resource type search + autocomplete -->
+      <div class="field">
+        <label for="resource-search">Resource type</label>
+        <div class="autocomplete" id="resource-autocomplete">
+          <input
+            id="resource-search"
+            type="text"
+            placeholder="Search e.g. 'virtual machine', 'vm', 'key vault'..."
+            autocomplete="off"
+          />
+          <ul class="autocomplete-list" id="resource-list" hidden></ul>
+        </div>
+        <small class="hint">Selected prefix auto-fills below.</small>
+      </div>
+
+      <!-- Prefix (auto-filled, editable) -->
+      <div class="field">
+        <label for="prefix">Resource prefix</label>
+        <input id="prefix" type="text" placeholder="auto-filled" />
+        <small class="hint" id="prefix-source"></small>
+      </div>
+
+      <div class="grid">
+        <!-- Environment -->
+        <div class="field">
+          <label for="env">Environment</label>
+          <select id="env"></select>
+        </div>
+
+        <!-- Region -->
+        <div class="field">
+          <label for="region">Region</label>
+          <select id="region"></select>
+        </div>
+
+        <!-- App name -->
+        <div class="field">
+          <label for="app-name">App name</label>
+          <input id="app-name" type="text" placeholder="web, api, auth..." />
+        </div>
+
+        <!-- Instance -->
+        <div class="field">
+          <label for="instance">Instance <span class="opt">(optional)</span></label>
+          <input id="instance" type="text" placeholder="01, 02..." />
+          <small class="hint" id="instance-hint"></small>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="checkbox">
+          <input type="checkbox" id="condensed" />
+          Use condensed format (for VMs / 15-char limit)
+        </label>
+        <small class="hint">Shortens env to a single letter (dev=d, test=t, prod=p). Recommended for VMs.</small>
+      </div>
+
+      <div class="field">
+        <label class="checkbox">
+          <input type="checkbox" id="no-dashes" />
+          Omit dashes (for resources that do not allow special characters)
+        </label>
+      </div>
+    </section>
+
+    <!-- PREVIEW ------------------------------------------------------------->
+    <section class="card preview-card">
+      <h2>Generated name</h2>
+      <div class="preview" id="preview" aria-live="polite">—</div>
+      <div class="preview-meta" id="preview-meta"></div>
+      <div class="actions">
+        <button id="copy-btn" type="button">Copy</button>
+        <button id="reset-btn" type="button" class="secondary">Reset</button>
+      </div>
+      <ul class="warnings" id="warnings"></ul>
+    </section>
+
+    <!-- RULES --------------------------------------------------------------->
+    <section class="card rules-card">
+      <h2>Naming standard</h2>
+      <div class="format-box">
+        <code id="format-display"></code>
+      </div>
+      <p class="rule-note" id="instance-rule-note"></p>
+      <h3>General rules</h3>
+      <ul class="rule-list" id="general-rules"></ul>
+      <h3>Components</h3>
+      <table class="components-table">
+        <thead>
+          <tr><th>Component</th><th>Description</th><th>Examples</th></tr>
+        </thead>
+        <tbody id="components-body"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>Prefixes from
+      <a href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations" target="_blank" rel="noopener">Microsoft CAF</a>.
+      Rules editable in <code>assets/config.js</code>.
+    </p>
+  </footer>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
