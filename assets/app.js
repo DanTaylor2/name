@@ -10,6 +10,39 @@
   const CFG = window.NAMING_CONFIG;
   const $ = (id) => document.getElementById(id);
 
+  // An explicit choice wins over the browser preference; otherwise CSS handles the preference.
+  const themeToggle = $("theme-toggle");
+  const themeIcon = themeToggle.querySelector(".theme-icon");
+  const themeLabel = themeToggle.querySelector(".theme-label");
+  const storedTheme = localStorage.getItem("naming-builder-theme");
+
+  function updateThemeToggle(isDark) {
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeIcon.textContent = isDark ? "☀" : "☾";
+    themeLabel.textContent = isDark ? "Light mode" : "Dark mode";
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    updateThemeToggle(theme === "dark");
+  }
+
+  const browserThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const hasStoredTheme = storedTheme === "dark" || storedTheme === "light";
+  if (hasStoredTheme) {
+    applyTheme(storedTheme);
+  } else {
+    updateThemeToggle(browserThemeQuery.matches);
+    browserThemeQuery.addEventListener("change", (event) => {
+      if (!localStorage.getItem("naming-builder-theme")) updateThemeToggle(event.matches);
+    });
+  }
+  themeToggle.addEventListener("click", () => {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem("naming-builder-theme", nextTheme);
+    applyTheme(nextTheme);
+  });
+
   // -------------------------------------------------------------------
   // Populate static selects / lists from config
   // -------------------------------------------------------------------
