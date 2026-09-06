@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Azure Resource Tag Builder</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-row">
+      <div>
+        <h1>Azure Resource Tag Builder</h1>
+        <p class="subtitle">Select approved tags and create the JSON for your Azure resource.</p>
+      </div>
+      <div class="header-actions">
+        <nav class="page-nav" aria-label="Primary navigation">
+          <a href="index.html">Names</a>
+          <a class="active" href="tagging.html" aria-current="page">Tags</a>
+        </nav>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
+          <span class="theme-icon" aria-hidden="true">☾</span>
+          <span class="theme-label">Dark mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="tagging-main">
+    <section class="card tag-form-card">
+      <div class="section-heading">
+        <div>
+          <h2>Select resource tags</h2>
+          <p class="rule-note">Choose only the tags that apply. Each selected tag becomes a property in the JSON output.</p>
+        </div>
+        <span class="tag-count" id="tag-count">0 selected</span>
+      </div>
+      <div id="tag-fields" class="tag-fields"></div>
+    </section>
+
+    <section class="card tag-output-card">
+      <h2>Azure tag JSON</h2>
+      <p class="rule-note">Paste this object into an Azure resource deployment, CLI command, PowerShell script, or policy workflow.</p>
+      <pre class="json-preview" id="tag-json" aria-live="polite">{}</pre>
+      <div class="actions">
+        <button id="copy-tags-btn" type="button">Copy JSON</button>
+        <button id="reset-tags-btn" type="button" class="secondary">Reset</button>
+      </div>
+      <p class="copy-status" id="copy-status" aria-live="polite"></p>
+    </section>
+
+    <section class="card rules-card tag-rules-card">
+      <h2>How Azure applies tags</h2>
+      <ul class="rule-list">
+        <li>Tags are key-value pairs attached to an Azure resource for ownership, governance, reporting, and cost management.</li>
+        <li>The JSON above contains only the tags you selected, so it can be merged into an existing resource definition.</li>
+        <li>Apply tags at deployment time where possible, or use Azure Policy to enforce required keys and approved values consistently.</li>
+        <li>Tag values are case-sensitive in this standard. Keep the key names exactly as shown.</li>
+      </ul>
+      <div class="format-box">
+        <code>az resource tag --tags key=value another-key=another-value</code>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Rules editable in <code>assets/config.js</code>.</p>
+  </footer>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/tagging.js"></script>
+</body>
+</html>

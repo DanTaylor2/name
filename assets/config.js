@@ -8,6 +8,67 @@
  * ===================================================================== */
 
 const NAMING_CONFIG = {
+  tags: [
+    {
+      key: "cost-centre",
+      label: "Cost centre",
+      description: "Financial attribution for show-back and future charge-back.",
+      type: "text",
+      hint: "Enter an approved finance cost code.",
+    },
+    {
+      key: "service-owner",
+      label: "Service owner",
+      description: "The accountable team, rather than an individual.",
+      type: "text",
+      hint: "Enter the accountable team or service owner.",
+    },
+    {
+      key: "business-unit",
+      label: "Business unit",
+      description: "The organisational division consuming the service.",
+      type: "text",
+      hint: "Enter the organisational division using the service.",
+    },
+    {
+      key: "environment",
+      label: "Environment",
+      description: "Segregation, reporting, and governance scope.",
+      values: ["prod", "nonprod", "dev", "test", "sandbox"],
+    },
+    {
+      key: "data-classification",
+      label: "Data classification",
+      description: "Information-governance and compliance sensitivity.",
+      values: ["Public", "Internal", "Confidential", "Highly Confidential"],
+    },
+    {
+      key: "creation-date",
+      label: "Creation date",
+      description: "Supports lifecycle management and technical debt governance.",
+      type: "date",
+      hint: "Use ISO 8601 format: YYYY-MM-DD.",
+    },
+    {
+      key: "migration-wave",
+      label: "Migration wave",
+      description: "AVS migration planning and cost tracking.",
+      values: ["0", "1", "2", "3"],
+    },
+    {
+      key: "modernisation-phase",
+      label: "Modernisation phase",
+      description: "Workload lifecycle after migration.",
+      values: ["none", "assess", "native", "retired"],
+    },
+    {
+      key: "dependency-criticality",
+      label: "Dependency criticality",
+      description: "Coupling risk and operational impact.",
+      values: ["low", "medium", "high"],
+    },
+  ],
+
   // 10.1 Base format. Tokens wrapped in {} are replaced with component
   // values. Reorder tokens here to change the generated name format.
   format: "{resourceType}-{env}-{appName}-{region}{instance}",
