@@ -244,8 +244,13 @@
   function update() {
     const result = generate();
     const warnings = validate(result);
+    const isValid = warnings.length === 0 && Boolean(result.name);
 
-    $("preview").textContent = result.name || "—";
+    const preview = $("preview");
+    preview.textContent = result.name || "—";
+    preview.classList.toggle("invalid", !isValid);
+    preview.setAttribute("aria-disabled", String(!isValid));
+    $("copy-btn").disabled = !isValid;
     $("preview-meta").textContent = [
       result.prefix && `prefix: ${result.prefix}`,
       result.env && `env: ${result.env}`,
@@ -258,7 +263,7 @@
 
     const wEl = $("warnings");
     wEl.innerHTML = "";
-    if (warnings.length === 0 && result.name) {
+    if (isValid) {
       wEl.innerHTML = "<li class='ok'>Name looks good.</li>";
     } else {
       warnings.forEach((w) => {
@@ -283,6 +288,7 @@
   ].forEach((id) => $(id).addEventListener("input", update));
 
   $("copy-btn").addEventListener("click", async () => {
+    if ($("copy-btn").disabled) return;
     const name = $("preview").textContent;
     if (!name || name === "—") return;
     try {

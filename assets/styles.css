@@ -126,6 +126,7 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
 }
 input:disabled { opacity: 0.5; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .grid {
   display: grid;
@@ -183,6 +184,12 @@ input:disabled { opacity: 0.5; }
   padding: 1rem;
   word-break: break-all;
   min-height: 3rem;
+}
+.preview.invalid {
+  background: var(--panel-2);
+  color: var(--muted);
+  cursor: not-allowed;
+  user-select: none;
 }
 .preview-meta { color: var(--muted); font-size: 0.78rem; margin-top: 0.5rem; font-family: var(--mono); }
 
