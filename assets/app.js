@@ -171,6 +171,31 @@
     update();
   }
 
+  function renderSuggestions(resource) {
+    const section = $("suggestions");
+    const list = $("suggestion-list");
+    const related = resource && resource.relatedResources;
+    list.innerHTML = "";
+    if (!related || related.length === 0) {
+      section.hidden = true;
+      return;
+    }
+
+    related
+      .map((abbr) => CFG.resources.find((resourceItem) => resourceItem.abbr === abbr))
+      .filter(Boolean)
+      .forEach((relatedResource) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "suggestion";
+        button.innerHTML = `<span>${relatedResource.name}</span><code>${relatedResource.abbr}</code>`;
+        button.title = `Use ${relatedResource.name} in the name builder`;
+        button.addEventListener("click", () => selectResource(relatedResource));
+        list.appendChild(button);
+      });
+    section.hidden = list.children.length === 0;
+  }
+
   searchInput.addEventListener("focus", () => renderList(searchInput.value));
   searchInput.addEventListener("input", () => {
     selectedResource = null;
@@ -281,6 +306,7 @@
     $("azure-rule-note").textContent = result.azureRule
       ? `${result.azureRule.label}: ${result.azureRule.reason}`
       : "No service-specific Azure rule is configured for this prefix.";
+    renderSuggestions(selectedResource);
 
     const wEl = $("warnings");
     wEl.innerHTML = "";

@@ -31,6 +31,7 @@ All naming rules live in **`assets/config.js`** — change them there, no other 
 - `condensedCharLimit` — character limit for condensed names.
 - `uniqueResources` / per-resource `multiInstance` — whether an instance number applies (§10.4).
 - `azureNameRules` — service-specific Azure restrictions, including allowed characters and length limits. The builder auto-corrects unambiguous violations and explains every correction.
+- `RESOURCE_RELATIONSHIPS` and `CATEGORY_RELATIONSHIPS` in `assets/config.js` — explicit and fallback resource relationship rules used for one-click companion suggestions.
 - `generalRules`, `instanceRule`, `components` — text shown in the UI.
 - `resources` — the full Azure abbreviation list, grouped by `category`. Each entry: `{ name, abbr, namespace, category, multiInstance }`.
 

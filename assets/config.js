@@ -387,5 +387,49 @@ const NAMING_CONFIG = {
   ],
 };
 
+// Resource relationship rules. Explicit entries take precedence over the
+// category defaults below; every catalog resource receives one of these sets.
+const RESOURCE_RELATIONSHIPS = {
+  vm: ["rg", "snet", "nic", "osdisk", "nsg", "pip"],
+  vmss: ["rg", "vnet", "snet", "nsg", "pip", "st"],
+  pip: ["rg", "vm", "nic", "nsg", "vnet", "lbi", "agw"],
+  nic: ["rg", "vm", "snet", "nsg", "pip", "vnet"],
+  nsg: ["rg", "vm", "nic", "snet", "vnet", "pip"],
+  vnet: ["rg", "snet", "nsg", "nic", "vgw", "pep"],
+  snet: ["rg", "vnet", "nsg", "nic", "vm", "pep"],
+  log: ["rg", "sql", "sqldb", "appi", "dcr", "st"],
+  sql: ["rg", "sqldb", "log", "kv", "appi", "st"],
+  sqldb: ["rg", "sql", "log", "kv", "appi", "st"],
+  appi: ["rg", "log", "dcr", "kv", "st", "app"],
+  dcr: ["rg", "log", "appi", "vm", "sql", "st"],
+  st: ["rg", "vm", "sql", "log", "func", "app"],
+  kv: ["rg", "vm", "sql", "app", "func", "st"],
+  rg: ["vnet", "vm", "sql", "st", "kv", "log"],
+  app: ["rg", "kv", "st", "appi", "log", "pip"],
+  func: ["rg", "kv", "st", "appi", "log", "vnet"],
+  aks: ["rg", "vnet", "snet", "nsg", "cr", "log"],
+  cr: ["rg", "aks", "ca", "log", "kv", "st"],
+  ca: ["rg", "vnet", "cr", "kv", "log", "appi"],
+  rsv: ["rg", "vm", "st", "log", "kv"],
+};
+
+const CATEGORY_RELATIONSHIPS = {
+  "Compute and web": ["rg", "vnet", "snet", "nsg", "log", "appi"],
+  "Containers": ["rg", "vnet", "snet", "cr", "log", "kv"],
+  "Databases": ["rg", "log", "kv", "st", "appi"],
+  "Management and governance": ["rg", "log", "appi", "dcr", "kv"],
+  "Networking": ["rg", "vnet", "snet", "nsg", "nic", "pip"],
+  "Security": ["rg", "vnet", "nsg", "kv", "log", "appi"],
+  "Storage": ["rg", "vm", "sql", "log", "kv", "appi"],
+  "Virtual desktop infrastructure": ["rg", "vnet", "snet", "nsg", "log", "kv"],
+};
+
+const resourceAbbreviations = new Set(NAMING_CONFIG.resources.map((resource) => resource.abbr));
+NAMING_CONFIG.resources.forEach((resource) => {
+  const candidates = RESOURCE_RELATIONSHIPS[resource.abbr] || CATEGORY_RELATIONSHIPS[resource.category] || ["rg", "log", "kv"];
+  resource.relatedResources = candidates.filter((abbr) => abbr !== resource.abbr && resourceAbbreviations.has(abbr));
+});
+NAMING_CONFIG.resourceRelationships = RESOURCE_RELATIONSHIPS;
+
 // Expose globally for app.js
 window.NAMING_CONFIG = NAMING_CONFIG;

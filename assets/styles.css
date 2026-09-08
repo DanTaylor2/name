@@ -246,6 +246,13 @@ button.secondary { background: var(--panel-2); border: 1px solid var(--border); 
 .warnings li.ok { color: var(--ok); }
 .warnings li.corrected { color: var(--accent-2); }
 .azure-rule-note { color: var(--muted); font-size: 0.78rem; margin: 0.6rem 0 0; }
+.suggestions { margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--border); }
+.suggestions-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
+.suggestions-heading h3 { margin: 0; }
+.suggestion-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+.suggestion { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.45rem 0.65rem; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); }
+.suggestion code { color: var(--accent-2); font-family: var(--mono); font-size: 0.78rem; }
+.suggestion:hover { border-color: var(--accent); filter: none; }
 
 /* Rules */
 .format-box {
