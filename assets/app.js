@@ -253,10 +253,6 @@
       const corrected = name.replace(invalidCharacters, azureRule.replacement).replace(/-{2,}/g, "-");
       if (corrected !== name) corrections.push(`${azureRule.label} names cannot use those characters; removed or replaced them.`);
       name = corrected.replace(/^-+|-+$/g, "");
-      if (name.length > azureRule.max) {
-        name = name.slice(0, azureRule.max).replace(/-+$/, "");
-        corrections.push(`Truncated to Azure's ${azureRule.max}-character limit.`);
-      }
       if (name.length > 0 && name.length < azureRule.min) corrections.push(`Azure requires at least ${azureRule.min} characters.`);
     }
 
@@ -305,7 +301,7 @@
     ].filter(Boolean).join("  •  ");
     $("azure-rule-note").textContent = result.azureRule
       ? `${result.azureRule.label}: ${result.azureRule.reason}`
-      : "No service-specific Azure rule is configured for this prefix.";
+      : "";
     renderSuggestions(selectedResource);
 
     const wEl = $("warnings");
