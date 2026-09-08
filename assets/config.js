@@ -86,6 +86,26 @@ const NAMING_CONFIG = {
   // resources (Windows VM 15-character limit).
   condensedCharLimit: 15,
 
+  // Azure service-specific naming restrictions. Rules are selected by the
+  // resource abbreviation and applied after the team naming format.
+  azureNameRules: {
+    st: { label: "Storage account", pattern: /^[a-z0-9]+$/, min: 3, max: 24, replacement: "", reason: "3-24 characters; lowercase letters and numbers only; dashes are not allowed." },
+    stvm: { label: "Storage account", pattern: /^[a-z0-9]+$/, min: 3, max: 24, replacement: "", reason: "3-24 characters; lowercase letters and numbers only; dashes are not allowed." },
+    kv: { label: "Key Vault", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 3, max: 24, allowed: "a-z0-9-", replacement: "-", reason: "3-24 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    vm: { label: "Virtual machine", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 1, max: 15, allowed: "a-z0-9-", replacement: "-", reason: "1-15 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    vmss: { label: "Virtual machine scale set", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 1, max: 15, allowed: "a-z0-9-", replacement: "-", reason: "1-15 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    cr: { label: "Container registry", pattern: /^[a-z0-9]+$/, min: 5, max: 50, replacement: "", reason: "5-50 characters; lowercase letters and numbers only; dashes are not allowed." },
+    sql: { label: "SQL server", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 1, max: 63, allowed: "a-z0-9-", replacement: "-", reason: "1-63 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    cosmos: { label: "Cosmos DB account", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 3, max: 44, allowed: "a-z0-9-", replacement: "-", reason: "3-44 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    coscas: { label: "Cosmos DB account", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 3, max: 44, allowed: "a-z0-9-", replacement: "-", reason: "3-44 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    cosmon: { label: "Cosmos DB account", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 3, max: 44, allowed: "a-z0-9-", replacement: "-", reason: "3-44 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    cosno: { label: "Cosmos DB account", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 3, max: 44, allowed: "a-z0-9-", replacement: "-", reason: "3-44 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    costab: { label: "Cosmos DB account", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 3, max: 44, allowed: "a-z0-9-", replacement: "-", reason: "3-44 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    cosgrm: { label: "Cosmos DB account", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 3, max: 44, allowed: "a-z0-9-", replacement: "-", reason: "3-44 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    appcs: { label: "App Configuration store", pattern: /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, min: 5, max: 50, allowed: "a-z0-9-", replacement: "-", reason: "5-50 characters; lowercase letters, numbers, and dashes; must start and end with a letter or number." },
+    rg: { label: "Resource group", pattern: /^[a-zA-Z0-9._()\-]+$/, min: 1, max: 90, allowed: "a-zA-Z0-9._()\-", replacement: "-", reason: "1-90 characters; letters, numbers, periods, underscores, parentheses, and dashes are allowed." }
+  },
+
   // 10.2 Components - descriptive metadata only (shown in the UI).
   components: [
     { name: "Resource Type", description: "Azure resource abbreviation", examples: "vm, rg, kv" },

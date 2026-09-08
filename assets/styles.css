@@ -244,6 +244,8 @@ button.secondary { background: var(--panel-2); border: 1px solid var(--border); 
   border-top: 1px solid var(--border);
 }
 .warnings li.ok { color: var(--ok); }
+.warnings li.corrected { color: var(--accent-2); }
+.azure-rule-note { color: var(--muted); font-size: 0.78rem; margin: 0.6rem 0 0; }
 
 /* Rules */
 .format-box {

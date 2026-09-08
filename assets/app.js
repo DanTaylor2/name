@@ -220,7 +220,22 @@
       name = name.replace(/-/g, "");
     }
 
-    return { name, prefix, env: envToken, appName, region, instance, condensed, noDashes };
+    const azureRule = CFG.azureNameRules[prefix];
+    const originalName = name;
+    const corrections = [];
+    if (azureRule) {
+      const invalidCharacters = new RegExp(`[^${azureRule.allowed || "a-z0-9"}]`, "g");
+      const corrected = name.replace(invalidCharacters, azureRule.replacement).replace(/-{2,}/g, "-");
+      if (corrected !== name) corrections.push(`${azureRule.label} names cannot use those characters; removed or replaced them.`);
+      name = corrected.replace(/^-+|-+$/g, "");
+      if (name.length > azureRule.max) {
+        name = name.slice(0, azureRule.max).replace(/-+$/, "");
+        corrections.push(`Truncated to Azure's ${azureRule.max}-character limit.`);
+      }
+      if (name.length > 0 && name.length < azureRule.min) corrections.push(`Azure requires at least ${azureRule.min} characters.`);
+    }
+
+    return { name, originalName, corrections, azureRule, prefix, env: envToken, appName, region, instance, condensed, noDashes };
   }
 
   function validate(result) {
@@ -237,6 +252,9 @@
       warnings.push(
         `Condensed name exceeds the ${CFG.condensedCharLimit}-character limit (currently ${result.name.length}). Shorten the app name.`
       );
+    }
+    if (result.azureRule && (result.name.length < result.azureRule.min || result.name.length > result.azureRule.max || !result.azureRule.pattern.test(result.name))) {
+      warnings.push(`${result.azureRule.label}: ${result.azureRule.reason}`);
     }
     return warnings;
   }
@@ -260,11 +278,23 @@
       result.condensed && "condensed",
       result.noDashes && "no-dashes",
     ].filter(Boolean).join("  •  ");
+    $("azure-rule-note").textContent = result.azureRule
+      ? `${result.azureRule.label}: ${result.azureRule.reason}`
+      : "No service-specific Azure rule is configured for this prefix.";
 
     const wEl = $("warnings");
     wEl.innerHTML = "";
     if (isValid) {
-      wEl.innerHTML = "<li class='ok'>Name looks good.</li>";
+      result.corrections.forEach((correction) => {
+        const li = document.createElement("li");
+        li.className = "corrected";
+        li.textContent = `Auto-corrected: ${correction}`;
+        wEl.appendChild(li);
+      });
+      const li = document.createElement("li");
+      li.className = "ok";
+      li.textContent = result.azureRule ? `${result.azureRule.label} rules satisfied.` : "Name looks good.";
+      wEl.appendChild(li);
     } else {
       warnings.forEach((w) => {
         const li = document.createElement("li");

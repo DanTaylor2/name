@@ -30,11 +30,14 @@ All naming rules live in **`assets/config.js`** — change them there, no other 
 - `condensedResources` — abbreviations that use the condensed 15-char format (default: `vm`, `vmss`).
 - `condensedCharLimit` — character limit for condensed names.
 - `uniqueResources` / per-resource `multiInstance` — whether an instance number applies (§10.4).
+- `azureNameRules` — service-specific Azure restrictions, including allowed characters and length limits. The builder auto-corrects unambiguous violations and explains every correction.
 - `generalRules`, `instanceRule`, `components` — text shown in the UI.
 - `resources` — the full Azure abbreviation list, grouped by `category`. Each entry: `{ name, abbr, namespace, category, multiInstance }`.
 
 The Azure abbreviations are sourced from the
 [Microsoft CAF resource abbreviations page](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations).
+Service restrictions are based on Microsoft's
+[Azure resource naming rules and restrictions](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules).
 
 ## File structure
 
