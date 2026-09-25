@@ -38,7 +38,7 @@
     });
   }
   themeToggle.addEventListener("click", () => {
-    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    const nextTheme = (document.documentElement.dataset.theme || (browserThemeQuery.matches ? "dark" : "light")) === "dark" ? "light" : "dark";
     localStorage.setItem("naming-builder-theme", nextTheme);
     applyTheme(nextTheme);
   });
@@ -148,27 +148,41 @@
       ? `Microsoft recommended: ${r.abbr} — ${r.namespace}`
       : `Microsoft recommended: ${r.abbr}`;
 
-    // Instance field behaviour per 10.4
-    if (!r.multiInstance || CFG.uniqueResources.includes(r.abbr)) {
-      $("instance").value = "";
-      $("instance").disabled = true;
-      $("instance-hint").textContent =
-        "Unique resource — instance number not required (10.4).";
-    } else {
-      $("instance").disabled = false;
-      $("instance-hint").textContent =
-        "Multiple instances possible — add an instance number (10.4).";
-    }
-
-    // Auto-enable condensed for VM-type resources per 10.5
-    if (CFG.condensedResources.includes(r.abbr)) {
-      $("condensed").checked = true;
-    } else {
-      $("condensed").checked = false;
-    }
+    $("condensed").checked = CFG.condensedResources.includes(r.abbr);
 
     listEl.hidden = true;
     update();
+  }
+
+  // Resolve from the editable prefix so the UI and generated format agree.
+  function syncResourceFields() {
+    const prefix = $("prefix").value.trim().toLowerCase();
+    const resource = selectedResource && selectedResource.abbr === prefix
+      ? selectedResource : CFG.resources.find((r) => r.abbr === prefix);
+    const special = Object.hasOwn(CFG.resourceFormats, prefix) ? CFG.resourceFormats[prefix] : null;
+    const format = special ? special.format : ($("condensed").checked ? CFG.condensedFormat : CFG.format);
+    ["app-name", "region", "instance", "source", "destination"].forEach((id) => {
+      const token = id === "app-name" ? "appName" : id;
+      const used = format.includes(`{${token}}`);
+      $(id + "-field").hidden = !used;
+      $(id).disabled = !used;
+      $(id).required = used && ["app-name", "source", "destination"].includes(id);
+    });
+    if (resource && (!resource.multiInstance || CFG.uniqueResources.includes(prefix))) {
+      $("instance").disabled = true;
+    }
+    $("instance-hint").textContent = $("instance").disabled
+      ? "Instance number not required for this resource."
+      : "Multiple instances possible — add an instance number (10.4).";
+    ["condensed", "no-dashes"].forEach((id) => {
+      $(id + "-field").hidden = Boolean(special);
+      $(id).disabled = Boolean(special);
+    });
+    $("app-name-label").textContent = special?.appLabel || "App name";
+    $("app-name").placeholder = special?.appPlaceholder || "web, api, auth...";
+    $("format-display").textContent = format;
+    $("instance-rule-note").textContent = special?.note || CFG.instanceRule;
+    return resource;
   }
 
   function renderSuggestions(resource) {
@@ -199,6 +213,10 @@
   searchInput.addEventListener("focus", () => renderList(searchInput.value));
   searchInput.addEventListener("input", () => {
     selectedResource = null;
+    $("prefix").value = "";
+    $("prefix-source").textContent = "";
+    $("condensed").checked = false;
+    update();
     renderList(searchInput.value);
   });
   searchInput.addEventListener("blur", () => {
@@ -220,23 +238,22 @@
     const prefix = $("prefix").value.trim().toLowerCase();
     const envVal = $("env").value;
     const env = CFG.environments.find((e) => e.value === envVal) || CFG.environments[0];
-    const region = $("region").value;
-    let appName = $("app-name").value.trim().toLowerCase();
-    let instance = $("instance").value.trim();
-    const condensed = $("condensed").checked;
-    const noDashes = $("no-dashes").checked;
+    const region = $("region").disabled ? "" : $("region").value;
+    const appName = $("app-name").disabled ? "" : $("app-name").value.trim().toLowerCase();
+    const instance = $("instance").disabled ? "" : $("instance").value.trim();
+    const source = $("source").disabled ? "" : $("source").value.trim().toLowerCase();
+    const destination = $("destination").disabled ? "" : $("destination").value.trim().toLowerCase();
+    const special = Object.hasOwn(CFG.resourceFormats, prefix) ? CFG.resourceFormats[prefix] : null;
+    const condensed = !special && $("condensed").checked;
+    const noDashes = !special && $("no-dashes").checked;
 
     const envToken = condensed ? env.condensed : env.short;
-    const format = condensed ? CFG.condensedFormat : CFG.format;
+    const format = special ? special.format : (condensed ? CFG.condensedFormat : CFG.format);
 
     // App name abbreviation suggestion for condensed mode (10.5)
     // e.g. 'book' -> 'bk' is a human decision; we just keep the user input.
-    let name = format
-      .replace("{resourceType}", prefix)
-      .replace("{env}", envToken)
-      .replace("{appName}", appName)
-      .replace("{region}", region)
-      .replace("{instance}", instance);
+    const tokens = { resourceType: prefix, env: envToken, appName, region, instance, source, destination };
+    let name = format.replace(/\{(\w+)\}/g, (_, token) => tokens[token] ?? "");
 
     // Collapse stray dashes from empty tokens
     name = name.replace(/-{2,}/g, "-").replace(/^-|-$/g, "");
@@ -245,7 +262,7 @@
       name = name.replace(/-/g, "");
     }
 
-    const azureRule = CFG.azureNameRules[prefix];
+    const azureRule = Object.hasOwn(CFG.azureNameRules, prefix) ? CFG.azureNameRules[prefix] : null;
     const originalName = name;
     const corrections = [];
     if (azureRule) {
@@ -256,14 +273,22 @@
       if (name.length > 0 && name.length < azureRule.min) corrections.push(`Azure requires at least ${azureRule.min} characters.`);
     }
 
-    return { name, originalName, corrections, azureRule, prefix, env: envToken, appName, region, instance, condensed, noDashes };
+    return { name, originalName, corrections, azureRule, prefix, env: envToken, appName, region, instance, source, destination, format, condensed, noDashes };
   }
 
   function validate(result) {
     const warnings = [];
     if (!result.prefix) warnings.push("Resource prefix is empty — pick a resource type.");
-    if (!result.appName) warnings.push("App name is empty.");
-    if (!/^[a-z0-9-]*$/.test(result.name) && !result.noDashes) {
+    if (result.format.includes("{appName}") && !result.appName) warnings.push(`${$("app-name-label").textContent} is empty.`);
+    for (const field of ["source", "destination"]) {
+      if (!result.format.includes(`{${field}}`)) continue;
+      if (!result[field]) warnings.push(`${field === "source" ? "Source" : "Destination"} VNet is required.`);
+      else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(result[field])) {
+        warnings.push(`${field === "source" ? "Source" : "Destination"} VNet must use letters, numbers, and single separating dashes.`);
+      }
+    }
+    if (result.instance && !/^\d+$/.test(result.instance)) warnings.push("Instance must contain digits only.");
+    if (!/^[a-z0-9-]*$/.test(result.name)) {
       warnings.push("Name contains characters other than lowercase letters, digits, and dashes.");
     }
     if (result.name && result.name !== result.name.toLowerCase()) {
@@ -281,6 +306,7 @@
   }
 
   function update() {
+    const resource = syncResourceFields();
     const result = generate();
     const warnings = validate(result);
     const isValid = warnings.length === 0 && Boolean(result.name);
@@ -296,13 +322,15 @@
       result.appName && `app: ${result.appName}`,
       result.region && `region: ${result.region}`,
       result.instance && `instance: ${result.instance}`,
+      result.source && `source: ${result.source}`,
+      result.destination && `destination: ${result.destination}`,
       result.condensed && "condensed",
       result.noDashes && "no-dashes",
     ].filter(Boolean).join("  •  ");
     $("azure-rule-note").textContent = result.azureRule
       ? `${result.azureRule.label}: ${result.azureRule.reason}`
       : "";
-    renderSuggestions(selectedResource);
+    renderSuggestions(resource);
 
     const wEl = $("warnings");
     wEl.innerHTML = "";
@@ -330,7 +358,8 @@
   // Wire up
   // -------------------------------------------------------------------
   [
-    "prefix",
+    "source",
+    "destination",
     "env",
     "region",
     "app-name",
@@ -338,6 +367,14 @@
     "condensed",
     "no-dashes",
   ].forEach((id) => $(id).addEventListener("input", update));
+
+  $("prefix").addEventListener("input", () => {
+    selectedResource = null;
+    searchInput.value = "";
+    $("prefix-source").textContent = "";
+    $("condensed").checked = CFG.condensedResources.includes($("prefix").value.trim().toLowerCase());
+    update();
+  });
 
   $("copy-btn").addEventListener("click", async () => {
     if ($("copy-btn").disabled) return;
@@ -359,6 +396,8 @@
     $("prefix").value = "";
     $("prefix-source").textContent = "";
     $("app-name").value = "";
+    $("source").value = "";
+    $("destination").value = "";
     $("instance").value = "";
     $("instance").disabled = false;
     $("instance-hint").textContent = "";

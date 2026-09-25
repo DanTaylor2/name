@@ -73,6 +73,21 @@ const NAMING_CONFIG = {
   // values. Reorder tokens here to change the generated name format.
   format: "{resourceType}-{env}-{appName}-{region}{instance}",
 
+  // Fixed team formats override condensed/no-dashes options. Only fields
+  // present in the template are shown and used by the builder.
+  resourceFormats: {
+    sub: {
+      format: "{resourceType}-{env}-{appName}",
+      appLabel: "Workload name",
+      appPlaceholder: "avs, connectivity, identity...",
+      note: "Subscriptions use sub-{env}-{appName}, without a region or instance number.",
+    },
+    peer: {
+      format: "{resourceType}-{env}-{region}-{source}-to-{destination}",
+      note: "Peering names identify the direction: source VNet to destination VNet. No app name or instance number is used.",
+    },
+  },
+
   // Format used for resources that must fit a tight character limit
   // (see 10.5). The env token is shortened to a single letter.
   condensedFormat: "{resourceType}-{env}-{appName}-{region}{instance}",
@@ -112,6 +127,7 @@ const NAMING_CONFIG = {
     { name: "Environment",   description: "Deployment environment",       examples: "prod, dev, test, qa" },
     { name: "App Name",      description: "Application identifier",      examples: "web, api, auth" },
     { name: "Region",        description: "Either UK South or UK West",   examples: "uks, ukw" },
+    { name: "Source / Destination", description: "VNet identifiers used only for peering", examples: "hub, spoke-avs" },
     { name: "Instance",      description: "Optional numeric identifier", examples: "01, 02" },
   ],
 
@@ -293,6 +309,7 @@ const NAMING_CONFIG = {
     { name: "Service Bus topic subscription", abbr: "sbts", namespace: "Microsoft.ServiceBus/namespaces/topics/subscriptions", category: "Integration", multiInstance: true },
 
     // Management and governance
+    { name: "Subscription", abbr: "sub", namespace: "Microsoft.Resources/subscriptions", category: "Management and governance", multiInstance: false },
     { name: "Automation account", abbr: "aa", namespace: "Microsoft.Automation/automationAccounts", category: "Management and governance", multiInstance: true },
     { name: "Application Insights", abbr: "appi", namespace: "Microsoft.Insights/components", category: "Management and governance", multiInstance: true },
     { name: "Azure Monitor action group", abbr: "ag", namespace: "Microsoft.Insights/actionGroups", category: "Management and governance", multiInstance: true },

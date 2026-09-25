@@ -31,7 +31,7 @@
   }
 
   themeToggle.addEventListener("click", () => {
-    const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+    const nextTheme = (root.dataset.theme || (browserThemeQuery.matches ? "dark" : "light")) === "dark" ? "light" : "dark";
     localStorage.setItem("naming-builder-theme", nextTheme);
     applyTheme(nextTheme);
   });
