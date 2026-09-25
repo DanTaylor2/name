@@ -1,6 +1,6 @@
 # Azure Resource Name Builder
 
-A static site that builds Azure resource names following the team naming standard (see `naming conection.md`). Deployable to GitHub Pages — no build step, no dependencies.
+A static site that builds Azure resource names following the team naming standard. Deployable to GitHub Pages — no build step, no dependencies.
 
 ## Run locally
 
@@ -25,6 +25,7 @@ Alternatively, use the **GitHub Actions** deployment workflow for more control.
 
 All naming rules live in **`assets/config.js`** — change them there, no other file needs editing:
 
+- `resourceFormats` — fixed formats for subscriptions (`sub-{env}-{appName}`) and VNet peerings (`peer-{env}-{region}-{source}-to-{destination}`). Peering shows source and destination fields; fields absent from the active format are hidden and ignored. These fixed formats retain full environment names and dashes.
 - `format` / `condensedFormat` — the name templates (reorder tokens freely).
 - `environments`, `regions` — allowed values (each environment has a `short` and `condensed` form per §10.5).
 - `condensedResources` — abbreviations that use the condensed 15-char format (default: `vm`, `vmss`).
@@ -48,3 +49,16 @@ assets/config.js    # ALL naming rules + resource abbreviations (edit me)
 assets/app.js       # name generation + autocomplete logic
 assets/styles.css   # styling
 ```
+
+
+## Naming examples
+
+- Subscription: production + workload `avs` → `sub-prod-avs` (no region or instance).
+- VNet peering: production + UK South + source `hub` + destination `spoke-avs` → `peer-prod-uks-hub-to-spoke-avs`.
+- Standard resources retain the existing format, e.g. `vnet-prod-avs-uks01`.
+
+Both peering endpoints are required. Use VNet names or short identifiers with letters, digits, and separating dashes; input is trimmed and lowercased. Copy stays disabled until the inputs are valid.
+
+## Checks
+
+Run `node --test tests/naming.test.cjs` with Node.js 22 or later. These dependency-free tests execute the actual naming and tagging scripts against a small DOM stub. They cover the fixed formats, required endpoints, switching/reset, copy output, existing resource formats, validation, tag JSON, and theme toggling. They do not replace a visual browser check.

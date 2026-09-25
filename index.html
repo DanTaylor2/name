@@ -62,26 +62,36 @@
         </div>
 
         <!-- Region -->
-        <div class="field">
+        <div class="field" id="region-field">
           <label for="region">Region</label>
           <select id="region"></select>
         </div>
 
         <!-- App name -->
-        <div class="field">
-          <label for="app-name">App name</label>
+        <div class="field" id="app-name-field">
+          <label for="app-name" id="app-name-label">App name</label>
           <input id="app-name" type="text" placeholder="web, api, auth..." />
         </div>
 
         <!-- Instance -->
-        <div class="field">
+        <div class="field" id="instance-field">
           <label for="instance">Instance <span class="opt">(optional)</span></label>
           <input id="instance" type="text" placeholder="01, 02..." />
           <small class="hint" id="instance-hint"></small>
         </div>
+        <div class="field" id="source-field" hidden>
+          <label for="source">Source VNet</label>
+          <input id="source" type="text" placeholder="hub" aria-describedby="source-hint" disabled />
+          <small class="hint" id="source-hint">Source VNet name or identifier, e.g. hub.</small>
+        </div>
+        <div class="field" id="destination-field" hidden>
+          <label for="destination">Destination VNet</label>
+          <input id="destination" type="text" placeholder="spoke-avs" aria-describedby="destination-hint" disabled />
+          <small class="hint" id="destination-hint">Destination VNet name or identifier, e.g. spoke-avs.</small>
+        </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="condensed-field">
         <label class="checkbox">
           <input type="checkbox" id="condensed" />
           Use condensed format (for VMs / 15-char limit)
@@ -89,7 +99,7 @@
         <small class="hint">Shortens env to a single letter (dev=d, test=t, prod=p). Recommended for VMs.</small>
       </div>
 
-      <div class="field">
+      <div class="field" id="no-dashes-field">
         <label class="checkbox">
           <input type="checkbox" id="no-dashes" />
           Omit dashes (for resources that do not allow special characters)
